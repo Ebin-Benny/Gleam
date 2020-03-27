@@ -30,18 +30,16 @@ drawPicture (Blank) canvas = do
 
 drawPicture (Circle radius) canvas = do
   canvas # UI.beginPath
-  canvas # UI.arc (0,0) (radius) (-pi) pi
+  canvas # UI.arc (0, 0) (radius) (-pi) pi
   canvas # UI.closePath
   canvas # UI.fill
   return ()
 
 drawPicture (Arc startAngle endAngle radius) canvas = do
   canvas # UI.beginPath
-  canvas # UI.moveTo (0,0)
-  canvas # UI.arc (0,0)
-                  (radius)
-                  (startAngle * (pi / 180))
-                  (endAngle * (pi / 180))
+  canvas # UI.moveTo (0, 0)
+  canvas
+    # UI.arc (0, 0) (radius) (startAngle * (pi / 180)) (endAngle * (pi / 180))
   canvas # UI.closePath
   canvas # UI.fill
   return ()
@@ -65,12 +63,14 @@ drawPicture (Text string font fontSize) canvas = do
 
 drawPicture (Image (Url url) width height) canvas = do
   img <- UI.img # set UI.src url
-  canvas # drawImage img (0-(width/2),0-(height/2)) width height
+  canvas # drawImage img (0 - (width / 2), 0 - (height / 2)) width height
   return ()
 
 drawPicture (Image (File file) width height) canvas = do
-  img <- UI.img # set UI.src (concat (intersperse "" ["http://127.0.0.1:8023/static/", file]))
-  canvas # drawImage img (0-(width/2),0-(height/2)) width height
+  img <- UI.img # set
+    UI.src
+    (concat (intersperse "" ["http://127.0.0.1:8023/static/", file]))
+  canvas # drawImage img (0 - (width / 2), 0 - (height / 2)) width height
   return ()
 
 drawPicture (Scale x y picture) canvas = do
@@ -101,11 +101,7 @@ drawPicture (Line ([])) _ = do
 drawPicture (Line ((x, y) : rest)) canvas = do
   canvas # UI.beginPath
   canvas # UI.moveTo (x, y)
-  forM_
-    rest
-    (\(x', y') ->
-      canvas # UI.lineTo (x', y')
-    )
+  forM_ rest (\(x', y') -> canvas # UI.lineTo (x', y'))
   canvas # UI.stroke
   return ()
 
@@ -118,11 +114,7 @@ drawPicture (Polygon ([])) _ = do
 drawPicture (Polygon ((x, y) : rest)) canvas = do
   canvas # UI.beginPath
   canvas # UI.moveTo (x, y)
-  forM_
-    rest
-    (\(x', y') ->
-      canvas # UI.lineTo (x', y')
-    )
+  forM_ rest (\(x', y') -> canvas # UI.lineTo (x', y'))
   canvas # UI.closePath
   canvas # UI.fill
   return ()
@@ -161,23 +153,30 @@ translateMiddle canvas = UI.runFunction
   $ ffi "%1.getContext('2d').translate(%1.width/2, %1.height/2)" canvas
 
 drawImage :: UI.Element -> Vector -> Double -> Double -> UI.Canvas -> UI ()
-drawImage image (x,y) width height canvas = UI.runFunction $ ffi "%1.getContext('2d').drawImage(%2,%3,%4,%5,%6)" canvas image x y width height
+drawImage image (x, y) width height canvas = UI.runFunction $ ffi
+  "%1.getContext('2d').drawImage(%2,%3,%4,%5,%6)"
+  canvas
+  image
+  x
+  y
+  width
+  height
 
 getMimeType :: String -> String
-getMimeType fileName  = case (last (splitOn "." fileName)) of
-  "apng" -> "image/apng"
-  "bmp"  -> "image/bmp"
-  "gif"  -> "image/gif"
-  "ico"  -> "image/x-icon"
-  "cur"  -> "image/x-icon"
-  "jpg"  -> "image/jpeg"
-  "jpeg" -> "image/jpeg"
-  "jfif" -> "image/jpeg"
-  "pjpeg"-> "image/jpeg"
-  "pjp"  -> "image/jpeg"
-  "png"  -> "image/png"
-  "svg"  -> "image/svg+xml"
-  "tif"  -> "image/tiff"
+getMimeType fileName = case (last (splitOn "." fileName)) of
+  "apng"  -> "image/apng"
+  "bmp"   -> "image/bmp"
+  "gif"   -> "image/gif"
+  "ico"   -> "image/x-icon"
+  "cur"   -> "image/x-icon"
+  "jpg"   -> "image/jpeg"
+  "jpeg"  -> "image/jpeg"
+  "jfif"  -> "image/jpeg"
+  "pjpeg" -> "image/jpeg"
+  "pjp"   -> "image/jpeg"
+  "png"   -> "image/png"
+  "svg"   -> "image/svg+xml"
+  "tif"   -> "image/tiff"
   "tiff"  -> "image/tiff"
   "webp"  -> "image/webp"
-  _      -> "image"
+  _       -> "image"

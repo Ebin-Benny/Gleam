@@ -23,8 +23,8 @@ handleEventsMultiple
   -> (InputEvent -> model -> model) -- ^ Function to handle input events.
   -> UI.Element                     -- ^ The canvas element.
   -> UI ()
-handleEventsMultiple gleamconfig currentState currentMousePos currentPause handler canvas =
-  do
+handleEventsMultiple gleamconfig currentState currentMousePos currentPause handler canvas
+  = do
     on UI.keydown canvas $ \c -> do
       pause <- liftIO $ readIORef currentPause
       case (pause) of
@@ -125,7 +125,9 @@ handleEvents gleamconfig currentState currentMousePos handler canvas = do
 
 convertMousePos :: GleamConfig -> (Int, Int) -> Point
 convertMousePos gleamconfig (x, y) =
-  (((fromIntegral x) - (fromIntegral (width gleamconfig)/2)), ((fromIntegral y) - (fromIntegral (height gleamconfig)/2)))
+  ( ((fromIntegral x) - (fromIntegral (width gleamconfig) / 2))
+  , ((fromIntegral y) - (fromIntegral (height gleamconfig) / 2))
+  )
 
 convertMouse :: Point -> KeyState -> InputEvent
 convertMouse pos state = (EventKey (Mouse) state pos)

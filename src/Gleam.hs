@@ -23,7 +23,7 @@ import           Utility
 import           Color
 import           Settings
 
-config = defaultConfig { jsStatic = Just "./images"}
+config = defaultConfig { jsStatic = Just "./images" }
 
 -- | Run a simulation in a window. You decide how the model is represented, how to convert the model to a picture and how to update the model. This function does the rest.
 play
@@ -51,9 +51,11 @@ setup
 setup gleamconfig initialModel draw update handler window = do
   return window # set title "ThreePennyGloss"
 
-  canvas <- UI.canvas # set UI.width (width gleamconfig) # set UI.height (height gleamconfig) # set
-    UI.style
-    [("background", "#bbb")]
+  canvas <-
+    UI.canvas
+    # set UI.width  (width gleamconfig)
+    # set UI.height (height gleamconfig)
+    # set UI.style  [("background", "#bbb")]
 
   canvas # setAttribute "tabindex" "1"
 
@@ -82,9 +84,10 @@ simulate ((Simulation simConfig simInitialModel simDraw simUpdate simHandler sim
   = do
     return ()
     canvas <-
-      UI.canvas # set UI.width (width simConfig) # set UI.height (height simConfig) # set
-        UI.style
-        [("background", "#bbb")]
+      UI.canvas
+      # set UI.width  (width simConfig)
+      # set UI.height (height simConfig)
+      # set UI.style  [("background", "#bbb")]
 
     canvas # setAttribute "tabindex" "1"
 

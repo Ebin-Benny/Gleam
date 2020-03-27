@@ -33,7 +33,7 @@ type Path = [Point]
 -- | An image location
 data Location =
   -- | Path to an image inside ./images. 
-  File String 
+  File String
   -- | An image url.
   | Url String
   deriving (Show, Eq)
@@ -122,7 +122,7 @@ rectangleWire sizeX sizeY = lineLoop $ rectanglePath sizeX sizeY
 
 
 -- | A solid rectangle centered about the origin.
-rectangleSolid 
+rectangleSolid
   :: Double         -- ^ width of rectangle
   -> Double         -- ^ height of rectangle
   -> Picture

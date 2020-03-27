@@ -7,8 +7,8 @@ module Settings
   )
 where
 
-import Picture
-import InputEvent
+import           Picture
+import           InputEvent
 
 data Simulation = forall model . Simulation {
   -- | Config for the canvas.
