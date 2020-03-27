@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK hide #-}
+
 module Render
   ( renderPicture
   )
@@ -10,6 +12,8 @@ import           Control.Monad
 import           Data.List
 import           Data.List.Split
 import           Picture
+import           Color
+import           Text
 
 renderPicture :: Picture -> Element -> UI ()
 renderPicture picture canvas = do
@@ -20,6 +24,9 @@ renderPicture picture canvas = do
   return ()
 
 drawPicture :: Picture -> Element -> UI ()
+
+drawPicture (Blank) canvas = do
+  return ()
 
 drawPicture (Circle radius) canvas = do
   canvas # UI.beginPath
@@ -39,9 +46,20 @@ drawPicture (Arc startAngle endAngle radius) canvas = do
   canvas # UI.fill
   return ()
 
+drawPicture (Rectangle width height) canvas = do
+  canvas # drawPicture (rectangleSolid width height)
+
+drawPicture (Stroke color size picture) canvas = do
+  canvas # saveDrawState
+  canvas # set' UI.strokeStyle (convertColor color)
+  canvas # set' UI.lineWidth size
+  canvas # drawPicture picture
+  canvas # restoreDrawState
+  return ()
+
 drawPicture (Text string font fontSize) canvas = do
   canvas # set' UI.textAlign (UI.Center)
-  canvas # set' UI.textFont (intercalate " " [fontSize, font])
+  canvas # set' UI.textFont (getCombinedFont font fontSize)
   canvas # UI.fillText string (0, 0)
   return ()
 
@@ -109,9 +127,9 @@ drawPicture (Polygon ((x, y) : rest)) canvas = do
   canvas # UI.fill
   return ()
 
-drawPicture (Color color picture) canvas = do
+drawPicture (FillColor color picture) canvas = do
   canvas # saveDrawState
-  canvas # set' UI.fillStyle (UI.htmlColor color)
+  canvas # set' UI.fillStyle (UI.htmlColor $ convertColor color)
   canvas # drawPicture picture
   canvas # restoreDrawState
   return ()

@@ -6,35 +6,20 @@ module Picture
   , Vector
   , Path
   , Location(..)
-
-        -- * Aliases for Picture constructors
-  , blank
-  , polygon
-  , line
-  , circle
-  , arc
-  , text
-  , color
-  , translate
-  , rotate
-  , scale
-  , pictures
-
         -- * Compound shapes
   , lineLoop
   , sectorWire
   , rectanglePath
   , rectangleWire
   , rectangleSolid
-  , rectangleUpperPath
-  , rectangleUpperWire
-  , rectangleUpperSolid
   )
 where
 
 import           Data.Monoid
 import           Data.Semigroup
 import           Data.Foldable
+import           Color
+import           Text
 
 -- | A point on the x-y plane.
 type Point = (Double, Double)
@@ -45,7 +30,12 @@ type Vector = Point
 -- | A path through the x-y plane.
 type Path = [Point]
 
-data Location = File String | Url String
+-- | An image location
+data Location =
+  -- | Path to an image inside ./images. 
+  File String 
+  -- | An image url.
+  | Url String
   deriving (Show, Eq)
 
 -- | A 2D picture
@@ -61,21 +51,22 @@ data Picture
         -- | A circular arc drawn counter-clockwise between two angles
         --  (in degrees) at the given radius.
         | Arc           Double Double Double
+        -- | A rectangle drawn with given width and height.
+        | Rectangle     Double Double
+        -- | A picture drawn with this stroke, given a color and size.
+        | Stroke        Color Double Picture
         -- | Some text to draw with a vector font.
-        | Text          String String String
-        -- | Image to draw from local file or url.
+        | Text          String Font FontSize
+        -- | Image to draw from a certain with given width and height.
         | Image         Location Double Double
-        -- Color ------------------------------------------
         -- | A picture drawn with this color.
-        | Color         String Picture
-        -- Transforms -------------------------------------
+        | FillColor     Color Picture
         -- | A picture translated by the given x and y coordinates.
         | Translate     Double Double Picture
         -- | A picture rotated clockwise by the given angle (in degrees).
         | Rotate        Double Picture
         -- | A picture scaled by the given x and y factors.
         | Scale         Double Double Picture
-        -- More Pictures ----------------------------------
         -- | A picture consisting of several others.
         | Pictures      [Picture]
         deriving (Show, Eq)
@@ -92,52 +83,6 @@ instance Semigroup Picture where
   sconcat = Pictures . toList
   stimes  = stimesIdempotent
 
--- | A blank picture, with nothing in it.
-blank :: Picture
-blank = Blank
-
--- | A convex polygon filled with a solid color.
-polygon :: Path -> Picture
-polygon = Polygon
-
--- | A line along an arbitrary path.
-line :: Path -> Picture
-line = Line
-
--- | A circle with the given radius.
-circle :: Double -> Picture
-circle = Circle
-
--- | A circular arc drawn counter-clockwise between two angles (in degrees)
---   at the given radius.
-arc :: Double -> Double -> Double -> Picture
-arc = Arc
-
--- | Some text to draw with a vector font.
-text :: String -> String -> String -> Picture
-text = Text
-
--- | A picture drawn with this color.
-color :: String -> Picture -> Picture
-color = Color
-
--- | A picture translated by the given x and y coordinates.
-translate :: Double -> Double -> Picture -> Picture
-translate = Translate
-
--- | A picture rotated clockwise by the given angle (in degrees).
-rotate :: Double -> Picture -> Picture
-rotate = Rotate
-
--- | A picture scaled by the given x and y factors.
-scale :: Double -> Double -> Picture -> Picture
-scale = Scale
-
--- | A picture consisting of several others.
-pictures :: [Picture] -> Picture
-pictures = Pictures
-
-
 -- Other Shapes ---------------------------------------------------------------
 -- | A closed loop along a path.
 lineLoop :: Path -> Picture
@@ -147,13 +92,7 @@ lineLoop (x : xs) = Line ((x : xs) ++ [x])
 
 -- | A wireframe sector of a circle.
 --   An arc is draw counter-clockwise from the first to the second angle at
---   the given radius. Lines are drawn from the origin to the ends of the arc.
----
---   NOTE: We take the absolute value of the radius incase it's negative.
---   It would also make sense to draw the sector flipped around the
---   origin, but I think taking the absolute value will be less surprising
---   for the user.
---
+--   the given radius.
 sectorWire :: Double -> Double -> Double -> Picture
 sectorWire a1 a2 r_ =
   let r = abs r_
@@ -165,8 +104,6 @@ sectorWire a1 a2 r_ =
 
 
 -- Rectangles -----------------------------------------------------------------
--- NOTE: Only the first of these rectangle functions has haddocks on the
---       arguments to reduce the amount of noise in the extracted docs.
 
 -- | A path representing a rectangle centered about the origin
 rectanglePath
@@ -184,25 +121,12 @@ rectangleWire :: Double -> Double -> Picture
 rectangleWire sizeX sizeY = lineLoop $ rectanglePath sizeX sizeY
 
 
--- | A wireframe rectangle in the y > 0 half of the x-y plane.
-rectangleUpperWire :: Double -> Double -> Picture
-rectangleUpperWire sizeX sizeY = lineLoop $ rectangleUpperPath sizeX sizeY
-
-
--- | A path representing a rectangle in the y > 0 half of the x-y plane.
-rectangleUpperPath :: Double -> Double -> Path
-rectangleUpperPath sizeX sy =
-  let sx = sizeX / 2 in [(-sx, 0), (-sx, sy), (sx, sy), (sx, 0)]
-
-
 -- | A solid rectangle centered about the origin.
-rectangleSolid :: Double -> Double -> Picture
+rectangleSolid 
+  :: Double         -- ^ width of rectangle
+  -> Double         -- ^ height of rectangle
+  -> Picture
 rectangleSolid sizeX sizeY = Polygon $ rectanglePath sizeX sizeY
-
-
--- | A solid rectangle in the y > 0 half of the x-y plane.
-rectangleUpperSolid :: Double -> Double -> Picture
-rectangleUpperSolid sizeX sizeY = Polygon $ rectangleUpperPath sizeX sizeY
 
 -- | Convert degrees to radians
 degToRad :: Double -> Double

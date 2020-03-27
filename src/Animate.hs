@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK hide #-}
+
 module Animate
   ( animateMultiple
   , animate
@@ -11,12 +13,13 @@ import           Graphics.UI.Threepenny.Timer
 import           Data.IORef
 import           Render
 
+-- | Animates the simulation for multiple canvases.
 animateMultiple
-  :: IORef model          -- | Current state of the simulation.
-  -> IORef Bool           -- | Whether the current simulation is paused.
-  -> (model -> model)     -- | Function to update the state of the simulation.
-  -> (model -> Picture)   -- | Function to generate a picture from a model.
-  -> UI.Element           -- | The canvas element.
+  :: IORef model          -- ^ Current state of the simulation.
+  -> IORef Bool           -- ^ Whether the current simulation is paused.
+  -> (model -> model)     -- ^ Function to update the state of the simulation.
+  -> (model -> Picture)   -- ^ Function to generate a picture from a model.
+  -> UI.Element           -- ^ The canvas element.
   -> UI Timer
 animateMultiple currentState currentPause update draw canvas = do
   t <- timer
@@ -33,11 +36,12 @@ animateMultiple currentState currentPause update draw canvas = do
         renderPicture (draw current) canvas
   return t # set interval 16 # set running True
 
+-- | Animates the simulation for a single canvas.
 animate
-  :: IORef model        -- | Current state of the simulation.
-  -> (model -> model)   -- | Function to update the state of the simulation.
-  -> (model -> Picture) -- | Function to generate a picture from a model.
-  -> UI.Element         -- | The canvas element.
+  :: IORef model        -- ^ Current state of the simulation.
+  -> (model -> model)   -- ^ Function to update the state of the simulation.
+  -> (model -> Picture) -- ^ Function to generate a picture from a model.
+  -> UI.Element         -- ^ The canvas element.
   -> UI Timer
 animate currentState update draw canvas = do
   t <- timer

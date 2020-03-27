@@ -1,11 +1,12 @@
-{-# LANGUAGE ExistentialQuantification #-}
+{-# OPTIONS_HADDOCK prune #-}
 
 module Gleam
   ( play
   , playMultiple
-  , Simulation(..)
   , module Picture
   , module InputEvent
+  , module Color
+  , module Settings
   )
 where
 
@@ -19,50 +20,38 @@ import           Animate
 import           InputEvent
 import           Handler
 import           Utility
-
-canvasSize :: Int
-canvasSize = 400
-
-data Simulation = forall model . Simulation {
-  -- | Initial model for a simulation.
-  simInitialModel :: model,
-  -- | Function to generate a picture from a model.
-  simDraw :: (model -> Picture),
-  -- | Function to update the state of the simulation.
-  simUpdate :: (model -> model),
-  -- | Function to handle input events.
-  simHandler :: (InputEvent -> model -> model),
-  -- | Title of the simulation.
-  simTitle :: String
-}
+import           Color
+import           Settings
 
 config = defaultConfig { jsStatic = Just "./images"}
 
 -- | Run a simulation in a window. You decide how the model is represented, how to convert the model to a picture and how to update the model. This function does the rest.
 play
-  :: model                          -- | Initial model for the simulation.
-  -> (model -> Picture)             -- | Function to generate a picture from a model.
-  -> (model -> model)               -- | Function to update the state of the simulation.
-  -> (InputEvent -> model -> model) -- | Function to handle input events.
+  :: GleamConfig                    -- ^ Canvas size.
+  -> model                          -- ^ Initial model for the simulation.
+  -> (model -> Picture)             -- ^ Function to generate a picture from a model.
+  -> (model -> model)               -- ^ Function to update the state of the simulation.
+  -> (InputEvent -> model -> model) -- ^ Function to handle input events.
   -> IO ()
-play initialModel draw update handler =
-  startGUI config $ setup initialModel draw update handler
+play gleamconfig initialModel draw update handler =
+  startGUI config $ setup gleamconfig initialModel draw update handler
 
 -- | Run multiple simulations in a window. You decide how each model is represented, how to convert each model to a picture and how to update the model. This function does the rest.
 playMultiple :: [Simulation] -> IO ()
 playMultiple simulations = startGUI config $ setupMultiple simulations
 
 setup
-  :: model                          -- | Initial model for the simulation.
-  -> (model -> Picture)             -- | Function to generate a picture from a model.
-  -> (model -> model)               -- | Function to update the state of the simulation.
-  -> (InputEvent -> model -> model) -- | Function to handle input events.
+  :: GleamConfig                    -- ^ Canvas size.
+  -> model                          -- ^ Initial model for the simulation.
+  -> (model -> Picture)             -- ^ Function to generate a picture from a model.
+  -> (model -> model)               -- ^ Function to update the state of the simulation.
+  -> (InputEvent -> model -> model) -- ^ Function to handle input events.
   -> Window
   -> UI ()
-setup initialModel draw update handler window = do
+setup gleamconfig initialModel draw update handler window = do
   return window # set title "ThreePennyGloss"
 
-  canvas <- UI.canvas # set UI.width canvasSize # set UI.height canvasSize # set
+  canvas <- UI.canvas # set UI.width (width gleamconfig) # set UI.height (height gleamconfig) # set
     UI.style
     [("background", "#bbb")]
 
@@ -74,7 +63,7 @@ setup initialModel draw update handler window = do
 
   currentMousePos <- liftIO $ newIORef (0.0, 0.0)
 
-  handleEvents currentState currentMousePos (handler) canvas
+  handleEvents gleamconfig currentState currentMousePos (handler) canvas
 
   animate currentState (update) (draw) canvas
 
@@ -89,11 +78,11 @@ setupMultiple simulations window = do
 simulate :: [Simulation] -> Window -> UI ()
 simulate ([]) _ = do
   return ()
-simulate ((Simulation simInitialModel simDraw simUpdate simHandler simTitle) : simulations) window
+simulate ((Simulation simConfig simInitialModel simDraw simUpdate simHandler simTitle) : simulations) window
   = do
     return ()
     canvas <-
-      UI.canvas # set UI.width canvasSize # set UI.height canvasSize # set
+      UI.canvas # set UI.width (width simConfig) # set UI.height (height simConfig) # set
         UI.style
         [("background", "#bbb")]
 
@@ -122,7 +111,8 @@ simulate ((Simulation simInitialModel simDraw simUpdate simHandler simTitle) : s
     on UI.click restartButton $ \_ -> do
       liftIO $ writeIORef currentState simInitialModel
 
-    handleEventsMultiple currentState
+    handleEventsMultiple simConfig
+                         currentState
                          currentMousePos
                          currentPause
                          (simHandler)

@@ -1,3 +1,5 @@
+{-# OPTIONS_HADDOCK hide #-}
+
 module Handler
   ( handleEventsMultiple
   , handleEvents
@@ -10,18 +12,18 @@ import           Data.Char
 import           Data.IORef
 import           InputEvent
 import           Picture
+import           Settings
 
-canvasSize :: Int
-canvasSize = 400
-
+-- | Handles events for multiple canvases.
 handleEventsMultiple
-  :: IORef model                    -- | Current state of the simulation.
-  -> IORef (Double, Double)         -- | Current mouse position.
-  -> IORef Bool                     -- | Whether the current simulation is paused.
-  -> (InputEvent -> model -> model) -- | Function to handle input events.
-  -> UI.Element                     -- | The canvas element.
+  :: GleamConfig                    -- ^ Canvas size.
+  -> IORef model                    -- ^ Current state of the simulation.
+  -> IORef (Double, Double)         -- ^ Current mouse position.
+  -> IORef Bool                     -- ^ Whether the current simulation is paused.
+  -> (InputEvent -> model -> model) -- ^ Function to handle input events.
+  -> UI.Element                     -- ^ The canvas element.
   -> UI ()
-handleEventsMultiple currentState currentMousePos currentPause handler canvas =
+handleEventsMultiple gleamconfig currentState currentMousePos currentPause handler canvas =
   do
     on UI.keydown canvas $ \c -> do
       pause <- liftIO $ readIORef currentPause
@@ -47,7 +49,7 @@ handleEventsMultiple currentState currentMousePos currentPause handler canvas =
         False -> do
           current <- liftIO $ readIORef currentState
           let updatedState = handler
-                (convertMouse (convertMousePos canvasSize pos) Up)
+                (convertMouse (convertMousePos gleamconfig pos) Up)
                 current
           liftIO $ writeIORef currentState updatedState
         True -> return ()
@@ -58,7 +60,7 @@ handleEventsMultiple currentState currentMousePos currentPause handler canvas =
         False -> do
           current <- liftIO $ readIORef currentState
           let updatedState = handler
-                (convertMouse (convertMousePos canvasSize pos) Down)
+                (convertMouse (convertMousePos gleamconfig pos) Down)
                 current
           liftIO $ writeIORef currentState updatedState
         True -> return ()
@@ -70,21 +72,23 @@ handleEventsMultiple currentState currentMousePos currentPause handler canvas =
           current  <- liftIO $ readIORef currentState
           mousePos <- liftIO $ readIORef currentMousePos
           let updatedState = handler
-                (convertMouseMove mousePos (convertMousePos canvasSize pos))
+                (convertMouseMove mousePos (convertMousePos gleamconfig pos))
                 current
           liftIO $ writeIORef currentState updatedState
-          liftIO $ writeIORef currentMousePos $ convertMousePos canvasSize pos
+          liftIO $ writeIORef currentMousePos $ convertMousePos gleamconfig pos
         True -> return ()
 
     return ()
 
+-- | Handles events for a single canvas.
 handleEvents
-  :: IORef model                    -- | Current state of the simulation.
-  -> IORef (Double, Double)         -- | Current mouse position.
-  -> (InputEvent -> model -> model) -- | Function to handle input events.
-  -> UI.Element                     -- | The canvas element.
+  :: GleamConfig                    -- ^ Canvas size.
+  -> IORef model                    -- ^ Current state of the simulation.
+  -> IORef (Double, Double)         -- ^ Current mouse position.
+  -> (InputEvent -> model -> model) -- ^ Function to handle input events.
+  -> UI.Element                     -- ^ The canvas element.
   -> UI ()
-handleEvents currentState currentMousePos handler canvas = do
+handleEvents gleamconfig currentState currentMousePos handler canvas = do
 
   on UI.keydown canvas $ \c -> do
     current <- liftIO $ readIORef currentState
@@ -99,29 +103,29 @@ handleEvents currentState currentMousePos handler canvas = do
   on UI.mouseup canvas $ \pos -> do
     current <- liftIO $ readIORef currentState
     let updatedState =
-          handler (convertMouse (convertMousePos canvasSize pos) Up) current
+          handler (convertMouse (convertMousePos gleamconfig pos) Up) current
     liftIO $ writeIORef currentState updatedState
 
   on UI.mousedown canvas $ \pos -> do
     current <- liftIO $ readIORef currentState
     let updatedState =
-          handler (convertMouse (convertMousePos canvasSize pos) Down) current
+          handler (convertMouse (convertMousePos gleamconfig pos) Down) current
     liftIO $ writeIORef currentState updatedState
 
   on UI.mousemove canvas $ \pos -> do
     current  <- liftIO $ readIORef currentState
     mousePos <- liftIO $ readIORef currentMousePos
     let updatedState = handler
-          (convertMouseMove mousePos (convertMousePos canvasSize pos))
+          (convertMouseMove mousePos (convertMousePos gleamconfig pos))
           current
     liftIO $ writeIORef currentState updatedState
-    liftIO $ writeIORef currentMousePos $ convertMousePos canvasSize pos
+    liftIO $ writeIORef currentMousePos $ convertMousePos gleamconfig pos
 
   return ()
 
-convertMousePos :: Int -> (Int, Int) -> Point
-convertMousePos canvasSize (x, y) =
-  (((fromIntegral x) - (fromIntegral canvasSize/2)), ((fromIntegral y) - (fromIntegral canvasSize/2)))
+convertMousePos :: GleamConfig -> (Int, Int) -> Point
+convertMousePos gleamconfig (x, y) =
+  (((fromIntegral x) - (fromIntegral (width gleamconfig)/2)), ((fromIntegral y) - (fromIntegral (height gleamconfig)/2)))
 
 convertMouse :: Point -> KeyState -> InputEvent
 convertMouse pos state = (EventKey (Mouse) state pos)
