@@ -16,7 +16,7 @@ synopsis:            HTML Canvas graphics, animations and simulations.
 
 source-repository head
   type:         git
-  location:     https://github.com/Ebin-Benny/Gleam
+  location:     https://github.com/Ebin-Benny/Gleam.git
 
 library
   exposed-modules:    Gleam
