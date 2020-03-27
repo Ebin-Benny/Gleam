@@ -49,11 +49,11 @@ library
   exposed-modules:    Gleam
 
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.9 && <4.10,
-                       threepenny-gui,
-                       gloss,
-                       mtl,
-                       split
+  build-depends:       base             >=4.9 && <4.10
+                       ,mtl             >= 2.2.2 && < 2.3
+                       ,split           >= 0.2.3 && < 0.3
+                       ,threepenny-gui  >= 0.8.3 && < 0.9
+
 
   -- Directories containing source files.
   hs-source-dirs:      src
