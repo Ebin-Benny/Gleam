@@ -25,7 +25,7 @@ import           Settings
 
 config = defaultConfig { jsStatic = Just "./images" }
 
--- | Run a simulation in a window. You decide how the model is represented, how to convert the model to a picture and how to update the model. This function does the rest.
+-- | Run a simulation in a window. You decide how the model is represented, how to convert the model to a picture and how to update the model. This function does the rest. The simulation can be seen on `127.0.0.1:8023`
 play
   :: GleamConfig                    -- ^ Canvas size.
   -> model                          -- ^ Initial model for the simulation.
@@ -36,7 +36,7 @@ play
 play gleamconfig initialModel draw update handler =
   startGUI config $ setup gleamconfig initialModel draw update handler
 
--- | Run multiple simulations in a window. You decide how each model is represented, how to convert each model to a picture and how to update the model. This function does the rest.
+-- | Run multiple simulations in a window. You decide how each model is represented, how to convert each model to a picture and how to update the model. This function does the rest. The simulations can be seen on `127.0.0.1:8023`
 playMultiple :: [Simulation] -> IO ()
 playMultiple simulations = startGUI config $ setupMultiple simulations
 
