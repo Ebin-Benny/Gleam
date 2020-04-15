@@ -1,5 +1,5 @@
 name:                Gleam
-version:             0.1.0.0
+version:             0.1.0.1
 cabal-version:       >=1.10
 license:             BSD3
 license-file:        LICENSE
@@ -21,8 +21,18 @@ source-repository head
 library
   exposed-modules:    Gleam
 
+  other-modules:      Animate,
+                      Color,
+                      Handler,
+                      InputEvent,
+                      Picture,
+                      Render,
+                      Settings,
+                      Text,
+                      Utility
+
   -- Other library packages from which modules are imported.
-  build-depends:       base             >=4.9 && <4.10
+  build-depends:       base             >=4.9 && <= 5
                        ,mtl             >= 2.2.2 && < 2.3
                        ,split           >= 0.2.3 && < 0.3
                        ,threepenny-gui  >= 0.8.3 && < 0.9

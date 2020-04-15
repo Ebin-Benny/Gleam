@@ -45,7 +45,8 @@ drawPicture (Arc startAngle endAngle radius) canvas = do
   return ()
 
 drawPicture (Rectangle width height) canvas = do
-  canvas # drawPicture (rectangleSolid width height)
+  canvas # UI.fillRect (0 - (width / 2), 0 - (height / 2)) width height
+  return ()
 
 drawPicture (Stroke color size picture) canvas = do
   canvas # saveDrawState
@@ -69,7 +70,7 @@ drawPicture (Image (Url url) width height) canvas = do
 drawPicture (Image (File file) width height) canvas = do
   img <- UI.img # set
     UI.src
-    (concat (intersperse "" ["http://127.0.0.1:8023/static/", file]))
+    ("http://127.0.0.1:8023/static/" ++ file)
   canvas # drawImage img (0 - (width / 2), 0 - (height / 2)) width height
   return ()
 
@@ -119,7 +120,7 @@ drawPicture (Polygon ((x, y) : rest)) canvas = do
   canvas # UI.fill
   return ()
 
-drawPicture (FillColor color picture) canvas = do
+drawPicture (Color color picture) canvas = do
   canvas # saveDrawState
   canvas # set' UI.fillStyle (UI.htmlColor $ convertColor color)
   canvas # drawPicture picture

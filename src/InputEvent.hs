@@ -9,14 +9,14 @@ where
 import           Picture
 
 data InputEvent
-        = EventKey Key KeyState Point
+        = EventKey Key KeyState
         | EventMotion Point Point
         deriving (Eq, Show)
 
 data Key
-        = Char       Char
-        | SpecialKey  SpecialKey
-        | Mouse
+        = Char          Char
+        | SpecialKey    SpecialKey
+        | Mouse         Point
         deriving (Show, Eq, Ord)
 
 data KeyState

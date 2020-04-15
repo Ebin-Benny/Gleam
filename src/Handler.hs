@@ -130,27 +130,27 @@ convertMousePos gleamconfig (x, y) =
   )
 
 convertMouse :: Point -> KeyState -> InputEvent
-convertMouse pos state = (EventKey (Mouse) state pos)
+convertMouse pos state = (EventKey (Mouse pos) state)
 
 convertMouseMove :: Point -> Point -> InputEvent
 convertMouseMove (x, y) (nx, ny) = (EventMotion ((x - nx), (y - ny)) (nx, ny))
 
 convertKeyCode :: UI.KeyCode -> KeyState -> InputEvent
 convertKeyCode code state
-  | charCodes code = (EventKey (Char (keyCodeToChar code)) state (0, 0))
-  | code == 8      = (EventKey (SpecialKey KeyBackspace) state (0, 0))
-  | code == 9      = (EventKey (SpecialKey KeyTab) state (0, 0))
-  | code == 13     = (EventKey (SpecialKey KeyEnter) state (0, 0))
-  | code == 16     = (EventKey (SpecialKey KeyShift) state (0, 0))
-  | code == 17     = (EventKey (SpecialKey KeyCtrl) state (0, 0))
-  | code == 18     = (EventKey (SpecialKey KeyAlt) state (0, 0))
-  | code == 20     = (EventKey (SpecialKey KeyCaps) state (0, 0))
-  | code == 27     = (EventKey (SpecialKey KeyEsc) state (0, 0))
-  | code == 37     = (EventKey (SpecialKey KeyLeft) state (0, 0))
-  | code == 38     = (EventKey (SpecialKey KeyUp) state (0, 0))
-  | code == 39     = (EventKey (SpecialKey KeyRight) state (0, 0))
-  | code == 40     = (EventKey (SpecialKey KeyDown) state (0, 0))
-  | otherwise      = (EventKey (SpecialKey KeyUnknown) state (0, 0))
+  | charCodes code = (EventKey (Char (keyCodeToChar code)) state)
+  | code == 8      = (EventKey (SpecialKey KeyBackspace) state)
+  | code == 9      = (EventKey (SpecialKey KeyTab) state)
+  | code == 13     = (EventKey (SpecialKey KeyEnter) state)
+  | code == 16     = (EventKey (SpecialKey KeyShift) state)
+  | code == 17     = (EventKey (SpecialKey KeyCtrl) state)
+  | code == 18     = (EventKey (SpecialKey KeyAlt) state)
+  | code == 20     = (EventKey (SpecialKey KeyCaps) state)
+  | code == 27     = (EventKey (SpecialKey KeyEsc) state)
+  | code == 37     = (EventKey (SpecialKey KeyLeft) state)
+  | code == 38     = (EventKey (SpecialKey KeyUp) state)
+  | code == 39     = (EventKey (SpecialKey KeyRight) state)
+  | code == 40     = (EventKey (SpecialKey KeyDown) state)
+  | otherwise      = (EventKey (SpecialKey KeyUnknown) state)
 
 keyCodeToChar :: UI.KeyCode -> Char
 keyCodeToChar code | (code >= 65 && code <= 90) = chr $ (ord 'z') - (90 - code)

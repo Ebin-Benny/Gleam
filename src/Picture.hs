@@ -5,7 +5,7 @@ module Picture
   , Point
   , Vector
   , Path
-  , Location(..)
+  , Source(..)
         -- * Compound shapes
   , lineLoop
   , sectorWire
@@ -31,7 +31,7 @@ type Vector = Point
 type Path = [Point]
 
 -- | An image location
-data Location =
+data Source =
   -- | Path to an image inside ./images. 
   File String
   -- | An image url.
@@ -42,10 +42,10 @@ data Location =
 data Picture
         -- | A blank picture, with nothing in it.
         = Blank
-        -- | A convex polygon filled with a solid color.
-        | Polygon       Path
         -- | A line along an arbitrary path.
         | Line          Path
+        -- | A polygon filled with a solid color.
+        | Polygon       Path
         -- | A circle with the given radius.
         | Circle        Double
         -- | A circular arc drawn counter-clockwise between two angles
@@ -53,18 +53,16 @@ data Picture
         | Arc           Double Double Double
         -- | A rectangle drawn with given width and height.
         | Rectangle     Double Double
-        -- | A picture drawn with this stroke, given a color and size.
-        | Stroke        Color Double Picture
+        -- | Image to draw from a certain with given width and height.
+        | Image         Source Double Double
         -- | Some text to draw with a vector font.
         | Text          String Font FontSize
-        -- | Image to draw from a certain with given width and height.
-        | Image         Location Double Double
         -- | A picture drawn with this color.
-        | FillColor     Color Picture
+        | Color     Color Picture
+        -- | A picture drawn with this stroke, given a color and size.
+        | Stroke        Color Double Picture
         -- | A picture translated by the given x and y coordinates.
         | Translate     Double Double Picture
-        -- | A picture rotated clockwise by the given angle (in degrees).
-        | Rotate        Double Picture
         -- | A picture scaled by the given x and y factors.
         | Scale         Double Double Picture
         -- | A picture consisting of several others.
