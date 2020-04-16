@@ -38,7 +38,7 @@ data Source =
   | Url String
   deriving (Show, Eq)
 
--- | A 2D picture
+-- | A 2D picture.
 data Picture
         -- | A blank picture, with nothing in it.
         = Blank
