@@ -23,6 +23,7 @@ import           Handler
 import           Utility
 import           Color
 import           Settings
+import           Text
 
 config = defaultConfig { jsStatic = Just "./images" }
 

@@ -1,5 +1,5 @@
 name:                Gleam
-version:             0.1.0.1
+version:             0.1.0.2
 cabal-version:       >=1.10
 license:             BSD3
 license-file:        LICENSE
@@ -19,16 +19,16 @@ source-repository head
   location:     https://github.com/Ebin-Benny/Gleam.git
 
 library
-  exposed-modules:    Gleam
-  
-  other-modules:      Animate,
+  exposed-modules:    Gleam,
                       Color,
-                      Handler,
                       InputEvent,
                       Picture,
-                      Render,
                       Settings,
-                      Text,
+                      Text
+
+  other-modules:      Animate,
+                      Handler,
+                      Render,
                       Utility
 
   -- Other library packages from which modules are imported.
