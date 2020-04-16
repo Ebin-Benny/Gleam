@@ -7,6 +7,7 @@ module Gleam
   , module InputEvent
   , module Color
   , module Settings
+  , module Text
   )
 where
 
