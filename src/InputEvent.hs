@@ -13,7 +13,7 @@ data InputEvent
         -- | A key or mouse button event
         = EventKey Key KeyState
         -- | A mouse motion event
-        | EventMotion Point Point
+        | EventMouse Point Point
         deriving (Eq, Show)
 
 -- | A key.

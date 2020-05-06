@@ -41,5 +41,5 @@ convertColor color = case (color) of
   Violet        -> "#EE82EE"
   Azure         -> "#007FFF"
   Chartreuse    -> "#7FFF00"
-  Orange        -> "ffa500"
+  Orange        -> "#FFA500"
   (RGBA string) -> string

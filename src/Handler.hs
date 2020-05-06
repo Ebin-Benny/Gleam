@@ -133,7 +133,7 @@ convertMouse :: Point -> KeyState -> InputEvent
 convertMouse pos state = (EventKey (Mouse pos) state)
 
 convertMouseMove :: Point -> Point -> InputEvent
-convertMouseMove (x, y) (nx, ny) = (EventMotion ((x - nx), (y - ny)) (nx, ny))
+convertMouseMove (x, y) (nx, ny) = (EventMouse ((x - nx), (y - ny)) (nx, ny))
 
 convertKeyCode :: UI.KeyCode -> KeyState -> InputEvent
 convertKeyCode code state

@@ -45,7 +45,9 @@ drawPicture (Arc startAngle endAngle radius) canvas = do
   return ()
 
 drawPicture (Rectangle width height) canvas = do
-  canvas # UI.fillRect (0 - (width / 2), 0 - (height / 2)) width height
+  canvas # UI.beginPath
+  canvas # drawRectangle (0 - (width / 2), 0 - (height / 2)) width height
+  canvas # UI.fill
   return ()
 
 drawPicture (Stroke color size picture) canvas = do
@@ -54,6 +56,7 @@ drawPicture (Stroke color size picture) canvas = do
   canvas # set' UI.lineWidth size
   canvas # drawPicture picture
   canvas # restoreDrawState
+  canvas # UI.stroke
   return ()
 
 drawPicture (Text string font fontSize) canvas = do
@@ -158,6 +161,15 @@ drawImage image (x, y) width height canvas = UI.runFunction $ ffi
   "%1.getContext('2d').drawImage(%2,%3,%4,%5,%6)"
   canvas
   image
+  x
+  y
+  width
+  height
+
+drawRectangle :: Vector -> Double -> Double -> UI.Canvas -> UI ()
+drawRectangle (x, y) width height canvas = UI.runFunction $ ffi
+  "%1.getContext('2d').rect(%2,%3,%4,%5)"
+  canvas
   x
   y
   width
